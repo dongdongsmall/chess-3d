@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>3D国际象棋</title>
+    <meta name="author" content="小熊开发">
+    <title>3D国际象棋 - 小熊开发</title>
     <style>
         * {
             margin: 0;
@@ -15,13 +16,21 @@
 
         body {
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             overflow: hidden;
             color: #fff;
             touch-action: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            transition: background 0.5s ease;
+        }
+
+        body.day-mode {
+            background: linear-gradient(135deg, #87CEEB 0%, #E0F6FF 100%);
+        }
+
+        body.night-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
 
         #game-container {
@@ -48,6 +57,20 @@
             pointer-events: auto;
         }
 
+        /* 作者信息 */
+        #author-info {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        body.day-mode #author-info {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
         /* 顶部信息栏 */
         #top-bar {
             position: absolute;
@@ -61,6 +84,11 @@
             align-items: center;
             gap: 30px;
             backdrop-filter: blur(10px);
+        }
+
+        body.day-mode #top-bar {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
         }
 
         .turn-indicator {
@@ -77,12 +105,140 @@
             border: 2px solid #fff;
         }
 
+        body.day-mode .turn-color {
+            border-color: #333;
+        }
+
         .turn-color.white { background: #f5f5dc; }
         .turn-color.black { background: #3a3a3a; }
 
         #game-status {
             font-size: 16px;
             color: #ffd700;
+        }
+
+        body.day-mode #game-status {
+            color: #d4a500;
+        }
+
+        /* 设置面板 */
+        #settings-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        body.day-mode #settings-panel {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        #settings-panel.show {
+            display: block;
+        }
+
+        #settings-panel h3 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #daa520;
+        }
+
+        body.day-mode #settings-panel h3 {
+            color: #8B4513;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+
+        body.day-mode .setting-group label {
+            color: #666;
+        }
+
+        .theme-buttons, .board-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .theme-btn, .board-btn {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        body.day-mode .theme-btn, body.day-mode .board-btn {
+            border-color: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .theme-btn:hover, .board-btn:hover,
+        .theme-btn.active, .board-btn.active {
+            background: rgba(218, 165, 32, 0.5);
+            border-color: #daa520;
+        }
+
+        /* 音乐控制 */
+        .music-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.day-mode .music-btn {
+            border-color: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #daa520;
+            cursor: pointer;
         }
 
         /* 侧边历史面板 */
@@ -98,10 +254,19 @@
             backdrop-filter: blur(10px);
         }
 
+        body.day-mode #history-panel {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
         #history-panel h3 {
             margin-bottom: 10px;
             font-size: 14px;
             color: #aaa;
+        }
+
+        body.day-mode #history-panel h3 {
+            color: #666;
         }
 
         #move-history {
@@ -157,9 +322,19 @@
             backdrop-filter: blur(10px);
         }
 
+        body.day-mode .btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
         .btn:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        body.day-mode .btn:hover {
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .btn:disabled {
@@ -174,6 +349,10 @@
 
         .btn-primary:hover {
             background: rgba(76, 175, 80, 1);
+        }
+
+        .btn-settings {
+            padding: 12px 16px;
         }
 
         /* 开始菜单 */
@@ -193,20 +372,27 @@
         .menu-content {
             text-align: center;
             padding: 40px;
+            max-width: 500px;
         }
 
         .menu-content h1 {
             font-size: 48px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             background: linear-gradient(135deg, #f5f5dc, #daa520);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
+        .menu-content .author {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
         .menu-content p {
             color: #888;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .menu-options {
@@ -232,6 +418,84 @@
             border-color: #6a8ba5;
             transform: scale(1.02);
         }
+
+        /* 棋盘风格选择 */
+        .board-style-select {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .board-style-select h3 {
+            margin-bottom: 15px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .board-style-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .board-style-btn {
+            width: 70px;
+            height: 70px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #aaa;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .board-style-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: brightness(0.7);
+        }
+
+        .board-style-btn span {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .board-style-btn:hover, .board-style-btn.active {
+            border-color: #daa520;
+            transform: scale(1.05);
+        }
+
+        .board-style-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #daa520;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+        /* 棋盘风格预览色 */
+        .board-classic { background: linear-gradient(135deg, #DEB887 50%, #8B4513 50%); }
+        .board-marble { background: linear-gradient(135deg, #F5F5F5 50%, #2F4F4F 50%); }
+        .board-minecraft { background: linear-gradient(135deg, #8BC34A 50%, #5D4037 50%); image-rendering: pixelated; }
+        .board-metal { background: linear-gradient(135deg, #C0C0C0 50%, #404040 50%); }
+        .board-glass { background: linear-gradient(135deg, rgba(173,216,230,0.8) 50%, rgba(70,130,180,0.8) 50%); }
 
         .difficulty-select {
             margin-top: 20px;
@@ -437,11 +701,15 @@
         /* 提示信息 */
         #hint-text {
             position: absolute;
-            bottom: 80px;
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%);
             color: #888;
             font-size: 14px;
+        }
+
+        body.day-mode #hint-text {
+            color: #666;
         }
 
         .hint-mobile {
@@ -461,7 +729,6 @@
         /* 移动端响应式样式 */
         /* ============================================ */
         @media (max-width: 768px) {
-            /* 顶部栏 */
             #top-bar {
                 top: 10px;
                 padding: 10px 15px;
@@ -481,7 +748,12 @@
                 font-size: 13px;
             }
 
-            /* 历史面板 - 移动端隐藏或缩小 */
+            #settings-panel {
+                top: 60px;
+                left: 10px;
+                padding: 10px;
+            }
+
             #history-panel {
                 top: auto;
                 bottom: 80px;
@@ -501,7 +773,6 @@
                 font-size: 11px;
             }
 
-            /* 底部控制栏 */
             #control-bar {
                 bottom: 15px;
                 gap: 8px;
@@ -512,15 +783,13 @@
                 font-size: 13px;
             }
 
-            /* 提示文字 */
             #hint-text {
-                bottom: 60px;
+                bottom: 55px;
                 font-size: 12px;
                 width: 90%;
                 text-align: center;
             }
 
-            /* 开始菜单 */
             .menu-content h1 {
                 font-size: 32px;
             }
@@ -533,6 +802,12 @@
             .menu-btn {
                 padding: 15px 30px;
                 font-size: 16px;
+            }
+
+            .board-style-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 9px;
             }
 
             .difficulty-select h3 {
@@ -549,7 +824,6 @@
                 height: 50px;
             }
 
-            /* 弹窗 */
             .modal-content {
                 padding: 25px 35px;
             }
@@ -568,14 +842,16 @@
                 font-size: 32px;
             }
 
-            /* AI思考提示 */
             #ai-thinking {
                 padding: 15px 25px;
                 font-size: 14px;
             }
+
+            #author-info {
+                font-size: 10px;
+            }
         }
 
-        /* 超小屏幕（手机竖屏） */
         @media (max-width: 480px) {
             #top-bar {
                 top: 5px;
@@ -601,7 +877,7 @@
             }
 
             #hint-text {
-                bottom: 50px;
+                bottom: 45px;
                 font-size: 11px;
             }
 
@@ -615,7 +891,6 @@
             }
         }
 
-        /* 横屏模式优化 */
         @media (max-height: 500px) and (orientation: landscape) {
             #top-bar {
                 top: 5px;
@@ -641,7 +916,7 @@
         }
     </style>
 </head>
-<body>
+<body class="night-mode">
     <div id="game-container"></div>
 
     <div id="ui-overlay">
@@ -654,6 +929,35 @@
             <div id="game-status"></div>
         </div>
 
+        <!-- 设置面板 -->
+        <div id="settings-panel">
+            <h3>游戏设置</h3>
+            <div class="setting-group">
+                <label>日夜模式</label>
+                <div class="theme-buttons">
+                    <button class="theme-btn" data-theme="day">☀️ 白天</button>
+                    <button class="theme-btn active" data-theme="night">🌙 黑夜</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>棋盘风格</label>
+                <div class="board-buttons">
+                    <button class="board-btn active" data-board="classic">经典</button>
+                    <button class="board-btn" data-board="marble">大理石</button>
+                    <button class="board-btn" data-board="minecraft">MC</button>
+                    <button class="board-btn" data-board="metal">金属</button>
+                    <button class="board-btn" data-board="glass">玻璃</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>背景音乐</label>
+                <div class="music-control">
+                    <button class="music-btn" id="btn-music">🔊</button>
+                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="30">
+                </div>
+            </div>
+        </div>
+
         <!-- 历史面板 -->
         <div id="history-panel">
             <h3>走法历史</h3>
@@ -662,8 +966,9 @@
 
         <!-- 底部控制栏 -->
         <div id="control-bar">
+            <button class="btn btn-settings" id="btn-settings">⚙️</button>
             <button class="btn" id="btn-undo" disabled>悔棋</button>
-            <button class="btn" id="btn-flip">翻转视角</button>
+            <button class="btn" id="btn-flip">翻转</button>
             <button class="btn btn-primary" id="btn-new">新局</button>
         </div>
 
@@ -678,17 +983,45 @@
             <div class="spinner"></div>
             <span>AI思考中...</span>
         </div>
+
+        <!-- 作者信息 -->
+        <div id="author-info">小熊开发 © 2024</div>
     </div>
 
     <!-- 开始菜单 -->
     <div id="start-menu">
         <div class="menu-content">
             <h1>3D国际象棋</h1>
-            <p>经典木质风格 | 逼真3D体验</p>
-            <div class="menu-options">
+            <p class="author">by 小熊开发</p>
+            <p>沉浸式3D体验 | 多种棋盘风格</p>
+
+            <!-- 棋盘风格选择 -->
+            <div class="board-style-select">
+                <h3>选择棋盘风格</h3>
+                <div class="board-style-buttons">
+                    <div class="board-style-btn board-classic active" data-board="classic">
+                        <span>经典木质</span>
+                    </div>
+                    <div class="board-style-btn board-marble" data-board="marble">
+                        <span>大理石</span>
+                    </div>
+                    <div class="board-style-btn board-minecraft" data-board="minecraft">
+                        <span>我的世界</span>
+                    </div>
+                    <div class="board-style-btn board-metal" data-board="metal">
+                        <span>金属质感</span>
+                    </div>
+                    <div class="board-style-btn board-glass" data-board="glass">
+                        <span>水晶玻璃</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-options" style="margin-top: 25px;">
                 <button class="menu-btn" id="btn-vs-player">双人对战</button>
                 <button class="menu-btn" id="btn-vs-ai">人机对战</button>
             </div>
+
             <div class="difficulty-select" id="difficulty-select">
                 <h3>选择难度</h3>
                 <div class="difficulty-buttons">
@@ -725,9 +1058,7 @@
     <div id="promotion-modal">
         <div class="promotion-content">
             <h3>选择升变棋子</h3>
-            <div class="promotion-pieces" id="promotion-pieces">
-                <!-- 动态生成 -->
-            </div>
+            <div class="promotion-pieces" id="promotion-pieces"></div>
         </div>
     </div>
 
@@ -748,28 +1079,221 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // ============================================
+        // 棋盘风格配置
+        // ============================================
+        const BOARD_STYLES = {
+            classic: {
+                name: '经典木质',
+                lightSquare: 0xDEB887,
+                darkSquare: 0x8B4513,
+                boardEdge: 0x5D4037,
+                lightRoughness: 0.8,
+                darkRoughness: 0.8,
+                metalness: 0.05
+            },
+            marble: {
+                name: '大理石',
+                lightSquare: 0xF5F5F5,
+                darkSquare: 0x2F4F4F,
+                boardEdge: 0x1a1a1a,
+                lightRoughness: 0.3,
+                darkRoughness: 0.4,
+                metalness: 0.1
+            },
+            minecraft: {
+                name: '我的世界',
+                lightSquare: 0x8BC34A,  // 草地绿
+                darkSquare: 0x5D4037,   // 泥土棕
+                boardEdge: 0x795548,
+                lightRoughness: 1.0,
+                darkRoughness: 1.0,
+                metalness: 0,
+                pixelated: true
+            },
+            metal: {
+                name: '金属质感',
+                lightSquare: 0xC0C0C0,
+                darkSquare: 0x404040,
+                boardEdge: 0x2a2a2a,
+                lightRoughness: 0.4,
+                darkRoughness: 0.3,
+                metalness: 0.8
+            },
+            glass: {
+                name: '水晶玻璃',
+                lightSquare: 0xADD8E6,
+                darkSquare: 0x4682B4,
+                boardEdge: 0x1e3a5f,
+                lightRoughness: 0.1,
+                darkRoughness: 0.2,
+                metalness: 0.2,
+                transparent: true,
+                opacity: 0.8
+            }
+        };
+
+        // ============================================
         // 游戏配置
         // ============================================
         const CONFIG = {
             BOARD_SIZE: 8,
             SQUARE_SIZE: 1,
             BOARD_HEIGHT: 0.15,
-            PIECE_SCALE: 0.4,
-            ANIMATION_DURATION: 300,
+            PIECE_SCALE: 0.38,
+            ANIMATION_DURATION: 400,
+            HAND_ANIMATION_DURATION: 300,
             CAMERA_DISTANCE: 12,
             COLORS: {
-                lightSquare: 0xDEB887,  // 浅木色
-                darkSquare: 0x8B4513,   // 深木色
-                boardEdge: 0x5D4037,    // 棋盘边框
-                whitePiece: 0xF5F5DC,   // 米白色棋子
-                blackPiece: 0x2C2C2C,   // 深灰色棋子
-                selected: 0xFFD700,     // 选中高亮
-                validMove: 0x00FF00,    // 合法移动
-                capture: 0xFF4444,      // 可吃子
-                lastMove: 0x4169E1,     // 上一步
-                check: 0xFF0000         // 将军
+                whitePiece: 0xFFFAF0,
+                blackPiece: 0x1a1a1a,
+                whitePieceAccent: 0xF5DEB3,
+                blackPieceAccent: 0x333333,
+                selected: 0xFFD700,
+                validMove: 0x00FF00,
+                capture: 0xFF4444,
+                lastMove: 0x4169E1,
+                check: 0xFF0000
             }
         };
+
+        // ============================================
+        // 背景音乐生成器
+        // ============================================
+        class MusicGenerator {
+            constructor() {
+                this.audioContext = null;
+                this.gainNode = null;
+                this.isPlaying = false;
+                this.volume = 0.3;
+                this.oscillators = [];
+                this.intervalId = null;
+            }
+
+            init() {
+                if (this.audioContext) return;
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.gainNode = this.audioContext.createGain();
+                this.gainNode.connect(this.audioContext.destination);
+                this.gainNode.gain.value = this.volume;
+            }
+
+            // 生成和弦
+            playChord(frequencies, duration) {
+                if (!this.audioContext || !this.isPlaying) return;
+
+                frequencies.forEach(freq => {
+                    const osc = this.audioContext.createOscillator();
+                    const oscGain = this.audioContext.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    oscGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    oscGain.gain.linearRampToValueAtTime(0.15, this.audioContext.currentTime + 0.1);
+                    oscGain.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + duration);
+
+                    osc.connect(oscGain);
+                    oscGain.connect(this.gainNode);
+
+                    osc.start();
+                    osc.stop(this.audioContext.currentTime + duration);
+                });
+            }
+
+            // 播放悠扬的背景音乐
+            play() {
+                this.init();
+                if (this.isPlaying) return;
+                this.isPlaying = true;
+
+                // 和弦进行（古典风格）
+                const chords = [
+                    [261.63, 329.63, 392.00],  // C大调
+                    [293.66, 369.99, 440.00],  // D小调
+                    [329.63, 415.30, 493.88],  // E小调
+                    [349.23, 440.00, 523.25],  // F大调
+                    [392.00, 493.88, 587.33],  // G大调
+                    [293.66, 369.99, 440.00],  // D小调
+                    [329.63, 392.00, 493.88],  // E小调
+                    [261.63, 329.63, 392.00],  // C大调
+                ];
+
+                let chordIndex = 0;
+
+                const playNext = () => {
+                    if (!this.isPlaying) return;
+                    this.playChord(chords[chordIndex], 2.5);
+                    chordIndex = (chordIndex + 1) % chords.length;
+                };
+
+                playNext();
+                this.intervalId = setInterval(playNext, 3000);
+            }
+
+            stop() {
+                this.isPlaying = false;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+
+            setVolume(value) {
+                this.volume = value;
+                if (this.gainNode) {
+                    this.gainNode.gain.value = value;
+                }
+            }
+
+            toggle() {
+                if (this.isPlaying) {
+                    this.stop();
+                } else {
+                    this.play();
+                }
+                return this.isPlaying;
+            }
+
+            // 播放落子音效
+            playMoveSound() {
+                this.init();
+                const osc = this.audioContext.createOscillator();
+                const gain = this.audioContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.audioContext.currentTime + 0.1);
+
+                gain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.audioContext.destination);
+
+                osc.start();
+                osc.stop(this.audioContext.currentTime + 0.15);
+            }
+
+            // 播放吃子音效
+            playCaptureSound() {
+                this.init();
+                const osc = this.audioContext.createOscillator();
+                const gain = this.audioContext.createGain();
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, this.audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.audioContext.destination);
+
+                osc.start();
+                osc.stop(this.audioContext.currentTime + 0.25);
+            }
+        }
 
         // ============================================
         // 主游戏类
@@ -780,39 +1304,46 @@
                 this.camera = null;
                 this.renderer = null;
                 this.controls = null;
-                this.chess = new Chess();  // chess.js实例
+                this.chess = new Chess();
 
-                this.pieces = {};          // 3D棋子对象 {notation: mesh}
-                this.squares = {};         // 棋盘格子 {notation: mesh}
-                this.highlights = [];      // 高亮标记
-                this.selectedPiece = null; // 当前选中的棋子
+                this.pieces = {};
+                this.squares = {};
+                this.highlights = [];
+                this.selectedPiece = null;
                 this.selectedSquare = null;
                 this.validMoves = [];
 
-                this.gameMode = 'pvp';     // 'pvp' 或 'pva'
+                this.gameMode = 'pvp';
                 this.aiLevel = 1;
                 this.playerColor = 'w';
                 this.isAIThinking = false;
                 this.lastMove = null;
                 this.pendingPromotion = null;
 
+                this.boardStyle = 'classic';
+                this.isDayMode = false;
+
                 this.raycaster = new THREE.Raycaster();
                 this.mouse = new THREE.Vector2();
+
+                // 手部模型
+                this.hand = null;
+                this.isHandAnimating = false;
+
+                // 音乐生成器
+                this.music = new MusicGenerator();
 
                 this.init();
                 this.setupEventListeners();
                 this.animate();
             }
 
-            // 初始化3D场景
             init() {
                 const container = document.getElementById('game-container');
 
-                // 场景
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x1a1a2e);
+                this.updateSceneBackground();
 
-                // 相机
                 this.camera = new THREE.PerspectiveCamera(
                     45,
                     window.innerWidth / window.innerHeight,
@@ -822,15 +1353,13 @@
                 this.camera.position.set(0, CONFIG.CAMERA_DISTANCE, CONFIG.CAMERA_DISTANCE * 0.8);
                 this.camera.lookAt(0, 0, 0);
 
-                // 渲染器
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 container.appendChild(this.renderer.domElement);
 
-                // 轨道控制
                 this.controls = new OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.05;
@@ -839,7 +1368,6 @@
                 this.controls.maxPolarAngle = Math.PI / 2.2;
                 this.controls.target.set(0, 0, 0);
 
-                // 移动端触摸优化
                 this.controls.touches = {
                     ONE: THREE.TOUCH.ROTATE,
                     TWO: THREE.TOUCH.DOLLY_PAN
@@ -847,30 +1375,42 @@
                 this.controls.rotateSpeed = 0.8;
                 this.controls.zoomSpeed = 1.2;
 
-                // 检测移动端，调整相机距离
                 if (this.isMobile()) {
                     this.camera.position.set(0, CONFIG.CAMERA_DISTANCE * 1.2, CONFIG.CAMERA_DISTANCE);
                 }
 
-                // 光照
                 this.setupLighting();
-
-                // 创建棋盘和棋子
                 this.createBoard();
                 this.createPieces();
+                this.createHand();
 
-                // 窗口大小调整
                 window.addEventListener('resize', () => this.onWindowResize());
             }
 
-            // 设置光照
+            updateSceneBackground() {
+                if (this.isDayMode) {
+                    this.scene.background = new THREE.Color(0x87CEEB);
+                } else {
+                    this.scene.background = new THREE.Color(0x1a1a2e);
+                }
+            }
+
             setupLighting() {
-                // 环境光
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                // 清除现有光源
+                this.scene.children
+                    .filter(child => child.isLight)
+                    .forEach(light => this.scene.remove(light));
+
+                const ambientIntensity = this.isDayMode ? 0.7 : 0.5;
+                const mainIntensity = this.isDayMode ? 1.0 : 0.8;
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
                 this.scene.add(ambientLight);
 
-                // 主光源
-                const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                const mainLight = new THREE.DirectionalLight(
+                    this.isDayMode ? 0xfffaf0 : 0xffffff,
+                    mainIntensity
+                );
                 mainLight.position.set(5, 15, 5);
                 mainLight.castShadow = true;
                 mainLight.shadow.mapSize.width = 2048;
@@ -883,28 +1423,33 @@
                 mainLight.shadow.camera.bottom = -10;
                 this.scene.add(mainLight);
 
-                // 补光
                 const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
                 fillLight.position.set(-5, 8, -5);
                 this.scene.add(fillLight);
 
-                // 底部反射光
                 const bottomLight = new THREE.DirectionalLight(0xffffff, 0.2);
                 bottomLight.position.set(0, -5, 0);
                 this.scene.add(bottomLight);
             }
 
-            // 创建棋盘
             createBoard() {
+                // 移除旧棋盘
+                const oldBoard = this.scene.getObjectByName('board');
+                if (oldBoard) {
+                    this.scene.remove(oldBoard);
+                }
+
                 const boardGroup = new THREE.Group();
                 boardGroup.name = 'board';
+
+                const style = BOARD_STYLES[this.boardStyle];
 
                 // 棋盘底座
                 const baseGeometry = new THREE.BoxGeometry(9, 0.3, 9);
                 const baseMaterial = new THREE.MeshStandardMaterial({
-                    color: CONFIG.COLORS.boardEdge,
+                    color: style.boardEdge,
                     roughness: 0.6,
-                    metalness: 0.1
+                    metalness: style.metalness
                 });
                 const base = new THREE.Mesh(baseGeometry, baseMaterial);
                 base.position.y = -0.15;
@@ -913,15 +1458,22 @@
 
                 // 棋盘格子
                 const lightMaterial = new THREE.MeshStandardMaterial({
-                    color: CONFIG.COLORS.lightSquare,
-                    roughness: 0.8,
-                    metalness: 0.05
+                    color: style.lightSquare,
+                    roughness: style.lightRoughness,
+                    metalness: style.metalness,
+                    transparent: style.transparent || false,
+                    opacity: style.opacity || 1
                 });
+
                 const darkMaterial = new THREE.MeshStandardMaterial({
-                    color: CONFIG.COLORS.darkSquare,
-                    roughness: 0.8,
-                    metalness: 0.05
+                    color: style.darkSquare,
+                    roughness: style.darkRoughness,
+                    metalness: style.metalness,
+                    transparent: style.transparent || false,
+                    opacity: style.opacity || 1
                 });
+
+                this.squares = {};
 
                 for (let row = 0; row < 8; row++) {
                     for (let col = 0; col < 8; col++) {
@@ -948,7 +1500,7 @@
                             row: row,
                             col: col,
                             isLight: isLight,
-                            originalColor: isLight ? CONFIG.COLORS.lightSquare : CONFIG.COLORS.darkSquare
+                            originalColor: isLight ? style.lightSquare : style.darkSquare
                         };
 
                         this.squares[notation] = square;
@@ -959,8 +1511,18 @@
                 this.scene.add(boardGroup);
             }
 
-            // 创建棋子
             createPieces() {
+                // 清除旧棋子
+                Object.keys(this.pieces).forEach(notation => {
+                    const piece = this.pieces[notation];
+                    if (piece) {
+                        this.scene.remove(piece);
+                        if (piece.geometry) piece.geometry.dispose();
+                        if (piece.material) piece.material.dispose();
+                    }
+                });
+                this.pieces = {};
+
                 const board = this.chess.board();
 
                 for (let row = 0; row < 8; row++) {
@@ -974,9 +1536,8 @@
                 }
             }
 
-            // 创建单个棋子
             createPiece(type, color, notation) {
-                const mesh = this.createPieceMesh(type, color);
+                const mesh = this.createRealisticPieceMesh(type, color);
                 const pos = this.notationToPosition(notation);
                 mesh.position.set(pos.x, pos.y, pos.z);
 
@@ -991,308 +1552,586 @@
                 this.scene.add(mesh);
             }
 
-            // 创建棋子3D网格（代码生成）
-            createPieceMesh(type, color) {
-                const pieceColor = color === 'w' ? CONFIG.COLORS.whitePiece : CONFIG.COLORS.blackPiece;
+            // 创建更真实的棋子
+            createRealisticPieceMesh(type, color) {
+                const isWhite = color === 'w';
+                const mainColor = isWhite ? CONFIG.COLORS.whitePiece : CONFIG.COLORS.blackPiece;
+                const accentColor = isWhite ? CONFIG.COLORS.whitePieceAccent : CONFIG.COLORS.blackPieceAccent;
+
                 const material = new THREE.MeshStandardMaterial({
-                    color: pieceColor,
-                    roughness: 0.4,
+                    color: mainColor,
+                    roughness: isWhite ? 0.3 : 0.5,
                     metalness: 0.1
                 });
 
-                let geometry;
+                let group;
                 const scale = CONFIG.PIECE_SCALE;
 
                 switch (type) {
-                    case 'p': // 兵
-                        geometry = this.createPawnGeometry(scale);
+                    case 'p':
+                        group = this.createRealisticPawn(scale, material);
                         break;
-                    case 'r': // 车
-                        geometry = this.createRookGeometry(scale);
+                    case 'r':
+                        group = this.createRealisticRook(scale, material);
                         break;
-                    case 'n': // 马
-                        geometry = this.createKnightGeometry(scale);
+                    case 'n':
+                        group = this.createRealisticKnight(scale, material, isWhite);
                         break;
-                    case 'b': // 象
-                        geometry = this.createBishopGeometry(scale);
+                    case 'b':
+                        group = this.createRealisticBishop(scale, material);
                         break;
-                    case 'q': // 后
-                        geometry = this.createQueenGeometry(scale);
+                    case 'q':
+                        group = this.createRealisticQueen(scale, material);
                         break;
-                    case 'k': // 王
-                        geometry = this.createKingGeometry(scale);
+                    case 'k':
+                        group = this.createRealisticKing(scale, material);
                         break;
                     default:
-                        geometry = new THREE.CylinderGeometry(0.3, 0.35, 0.8, 16);
+                        group = this.createRealisticPawn(scale, material);
                 }
 
-                const mesh = new THREE.Mesh(geometry, material);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                return mesh;
+                group.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                return group;
             }
 
-            // 兵的几何体
-            createPawnGeometry(scale) {
+            // 真实的兵
+            createRealisticPawn(scale, material) {
                 const group = new THREE.Group();
 
-                // 底座
-                const base = new THREE.CylinderGeometry(0.35 * scale, 0.4 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
+                // 底座 - 宽厚的圆形
+                const base1 = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.1 * scale, 32),
+                    material
+                );
+                base1.position.y = 0.05 * scale;
+                group.add(base1);
 
-                // 身体
-                const body = new THREE.CylinderGeometry(0.25 * scale, 0.35 * scale, 0.5 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.4 * scale;
-                group.add(bodyMesh);
+                // 底座装饰环
+                const baseRing = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.38 * scale, 0.03 * scale, 8, 32),
+                    material
+                );
+                baseRing.rotation.x = Math.PI / 2;
+                baseRing.position.y = 0.12 * scale;
+                group.add(baseRing);
 
-                // 头部
-                const head = new THREE.SphereGeometry(0.22 * scale, 16, 16);
-                const headMesh = new THREE.Mesh(head);
-                headMesh.position.y = 0.8 * scale;
-                group.add(headMesh);
-
-                return this.mergeGroup(group);
-            }
-
-            // 车的几何体
-            createRookGeometry(scale) {
-                const group = new THREE.Group();
-
-                // 底座
-                const base = new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
-
-                // 身体
-                const body = new THREE.CylinderGeometry(0.32 * scale, 0.38 * scale, 0.8 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.55 * scale;
-                group.add(bodyMesh);
-
-                // 顶部
-                const top = new THREE.CylinderGeometry(0.38 * scale, 0.32 * scale, 0.2 * scale, 16);
-                const topMesh = new THREE.Mesh(top);
-                topMesh.position.y = 1.05 * scale;
-                group.add(topMesh);
-
-                // 城垛
-                for (let i = 0; i < 4; i++) {
-                    const merlon = new THREE.BoxGeometry(0.15 * scale, 0.2 * scale, 0.15 * scale);
-                    const merlonMesh = new THREE.Mesh(merlon);
-                    const angle = (i / 4) * Math.PI * 2;
-                    merlonMesh.position.set(
-                        Math.cos(angle) * 0.25 * scale,
-                        1.25 * scale,
-                        Math.sin(angle) * 0.25 * scale
-                    );
-                    group.add(merlonMesh);
-                }
-
-                return this.mergeGroup(group);
-            }
-
-            // 马的几何体
-            createKnightGeometry(scale) {
-                const group = new THREE.Group();
-
-                // 底座
-                const base = new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
-
-                // 身体
-                const body = new THREE.CylinderGeometry(0.28 * scale, 0.38 * scale, 0.5 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.4 * scale;
-                group.add(bodyMesh);
+                // 身体 - 渐细的圆柱
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.18 * scale, 0.32 * scale, 0.5 * scale, 32),
+                    material
+                );
+                body.position.y = 0.38 * scale;
+                group.add(body);
 
                 // 颈部
-                const neck = new THREE.CylinderGeometry(0.18 * scale, 0.25 * scale, 0.5 * scale, 16);
-                const neckMesh = new THREE.Mesh(neck);
-                neckMesh.position.set(0.1 * scale, 0.85 * scale, 0);
-                neckMesh.rotation.z = -0.3;
-                group.add(neckMesh);
+                const neck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.15 * scale, 0.18 * scale, 0.15 * scale, 32),
+                    material
+                );
+                neck.position.y = 0.7 * scale;
+                group.add(neck);
 
-                // 头部
-                const head = new THREE.BoxGeometry(0.25 * scale, 0.3 * scale, 0.2 * scale);
-                const headMesh = new THREE.Mesh(head);
-                headMesh.position.set(0.25 * scale, 1.15 * scale, 0);
-                headMesh.rotation.z = -0.4;
-                group.add(headMesh);
+                // 头部 - 圆球
+                const head = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.2 * scale, 32, 32),
+                    material
+                );
+                head.position.y = 0.9 * scale;
+                group.add(head);
+
+                return group;
+            }
+
+            // 真实的车
+            createRealisticRook(scale, material) {
+                const group = new THREE.Group();
+
+                // 底座
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.42 * scale, 0.48 * scale, 0.12 * scale, 32),
+                    material
+                );
+                base.position.y = 0.06 * scale;
+                group.add(base);
+
+                // 底座装饰
+                const baseDecor = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.38 * scale, 0.42 * scale, 0.08 * scale, 32),
+                    material
+                );
+                baseDecor.position.y = 0.16 * scale;
+                group.add(baseDecor);
+
+                // 主体柱
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.28 * scale, 0.35 * scale, 0.7 * scale, 32),
+                    material
+                );
+                body.position.y = 0.55 * scale;
+                group.add(body);
+
+                // 顶部平台
+                const platform = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.35 * scale, 0.28 * scale, 0.1 * scale, 32),
+                    material
+                );
+                platform.position.y = 0.95 * scale;
+                group.add(platform);
+
+                // 城垛
+                const merlonCount = 5;
+                for (let i = 0; i < merlonCount; i++) {
+                    const merlon = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.12 * scale, 0.2 * scale, 0.12 * scale),
+                        material
+                    );
+                    const angle = (i / merlonCount) * Math.PI * 2;
+                    merlon.position.set(
+                        Math.cos(angle) * 0.25 * scale,
+                        1.1 * scale,
+                        Math.sin(angle) * 0.25 * scale
+                    );
+                    group.add(merlon);
+                }
+
+                return group;
+            }
+
+            // 真实的马
+            createRealisticKnight(scale, material, isWhite) {
+                const group = new THREE.Group();
+
+                // 底座
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.12 * scale, 32),
+                    material
+                );
+                base.position.y = 0.06 * scale;
+                group.add(base);
+
+                // 底座装饰
+                const baseDecor = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.35 * scale, 0.4 * scale, 0.08 * scale, 32),
+                    material
+                );
+                baseDecor.position.y = 0.16 * scale;
+                group.add(baseDecor);
+
+                // 身体底部
+                const bodyBase = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.25 * scale, 0.32 * scale, 0.3 * scale, 32),
+                    material
+                );
+                bodyBase.position.y = 0.35 * scale;
+                group.add(bodyBase);
+
+                // 马颈 - 弯曲的形状
+                const neckCurve = new THREE.CatmullRomCurve3([
+                    new THREE.Vector3(0, 0.5 * scale, 0),
+                    new THREE.Vector3(0.1 * scale, 0.7 * scale, 0),
+                    new THREE.Vector3(0.15 * scale, 0.9 * scale, 0),
+                    new THREE.Vector3(0.1 * scale, 1.1 * scale, 0),
+                ]);
+
+                const neckGeometry = new THREE.TubeGeometry(neckCurve, 20, 0.12 * scale, 16, false);
+                const neck = new THREE.Mesh(neckGeometry, material);
+                group.add(neck);
+
+                // 马头
+                const head = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.15 * scale, 0.25 * scale, 0.2 * scale),
+                    material
+                );
+                head.position.set(0.2 * scale, 1.15 * scale, 0);
+                head.rotation.z = -0.5;
+                group.add(head);
+
+                // 马嘴
+                const muzzle = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1 * scale, 0.12 * scale, 0.15 * scale),
+                    material
+                );
+                muzzle.position.set(0.35 * scale, 1.05 * scale, 0);
+                muzzle.rotation.z = -0.3;
+                group.add(muzzle);
 
                 // 耳朵
-                const ear = new THREE.ConeGeometry(0.08 * scale, 0.15 * scale, 8);
-                const earMesh = new THREE.Mesh(ear);
-                earMesh.position.set(0.15 * scale, 1.35 * scale, 0);
-                group.add(earMesh);
+                const ear1 = new THREE.Mesh(
+                    new THREE.ConeGeometry(0.05 * scale, 0.12 * scale, 8),
+                    material
+                );
+                ear1.position.set(0.12 * scale, 1.3 * scale, 0.06 * scale);
+                ear1.rotation.z = 0.3;
+                group.add(ear1);
 
-                return this.mergeGroup(group);
+                const ear2 = ear1.clone();
+                ear2.position.z = -0.06 * scale;
+                group.add(ear2);
+
+                // 鬃毛
+                for (let i = 0; i < 5; i++) {
+                    const mane = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.03 * scale, 0.1 * scale, 0.15 * scale),
+                        material
+                    );
+                    mane.position.set(-0.05 * scale, (0.7 + i * 0.1) * scale, 0);
+                    mane.rotation.z = 0.5;
+                    group.add(mane);
+                }
+
+                // 根据颜色调整朝向
+                if (!isWhite) {
+                    group.rotation.y = Math.PI;
+                }
+
+                return group;
             }
 
-            // 象的几何体
-            createBishopGeometry(scale) {
+            // 真实的象
+            createRealisticBishop(scale, material) {
                 const group = new THREE.Group();
 
                 // 底座
-                const base = new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.12 * scale, 32),
+                    material
+                );
+                base.position.y = 0.06 * scale;
+                group.add(base);
 
-                // 身体
-                const body = new THREE.CylinderGeometry(0.2 * scale, 0.38 * scale, 0.8 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.55 * scale;
-                group.add(bodyMesh);
+                // 底座装饰
+                const baseDecor = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.35 * scale, 0.4 * scale, 0.08 * scale, 32),
+                    material
+                );
+                baseDecor.position.y = 0.16 * scale;
+                group.add(baseDecor);
 
-                // 上部
-                const upper = new THREE.SphereGeometry(0.25 * scale, 16, 16);
-                const upperMesh = new THREE.Mesh(upper);
-                upperMesh.scale.y = 1.5;
-                upperMesh.position.y = 1.1 * scale;
-                group.add(upperMesh);
+                // 身体 - 渐细
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.15 * scale, 0.32 * scale, 0.6 * scale, 32),
+                    material
+                );
+                body.position.y = 0.5 * scale;
+                group.add(body);
+
+                // 颈部环
+                const neckRing = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.18 * scale, 0.04 * scale, 8, 32),
+                    material
+                );
+                neckRing.rotation.x = Math.PI / 2;
+                neckRing.position.y = 0.85 * scale;
+                group.add(neckRing);
+
+                // 头部 - 水滴形
+                const headGeometry = new THREE.SphereGeometry(0.2 * scale, 32, 32);
+                headGeometry.scale(1, 1.5, 1);
+                const head = new THREE.Mesh(headGeometry, material);
+                head.position.y = 1.1 * scale;
+                group.add(head);
+
+                // 斜切口（象的标志）
+                const slitGeometry = new THREE.BoxGeometry(0.03 * scale, 0.25 * scale, 0.25 * scale);
+                const slit = new THREE.Mesh(slitGeometry, new THREE.MeshStandardMaterial({ color: 0x000000 }));
+                slit.position.set(0.18 * scale, 1.1 * scale, 0);
+                slit.rotation.y = 0.3;
+                group.add(slit);
 
                 // 顶部小球
-                const tip = new THREE.SphereGeometry(0.1 * scale, 12, 12);
-                const tipMesh = new THREE.Mesh(tip);
-                tipMesh.position.y = 1.5 * scale;
-                group.add(tipMesh);
+                const tip = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.08 * scale, 16, 16),
+                    material
+                );
+                tip.position.y = 1.42 * scale;
+                group.add(tip);
 
-                return this.mergeGroup(group);
+                return group;
             }
 
-            // 后的几何体
-            createQueenGeometry(scale) {
+            // 真实的后
+            createRealisticQueen(scale, material) {
                 const group = new THREE.Group();
 
                 // 底座
-                const base = new THREE.CylinderGeometry(0.42 * scale, 0.48 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.45 * scale, 0.5 * scale, 0.12 * scale, 32),
+                    material
+                );
+                base.position.y = 0.06 * scale;
+                group.add(base);
+
+                // 底座装饰
+                const baseDecor = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.4 * scale, 0.45 * scale, 0.08 * scale, 32),
+                    material
+                );
+                baseDecor.position.y = 0.16 * scale;
+                group.add(baseDecor);
 
                 // 身体
-                const body = new THREE.CylinderGeometry(0.22 * scale, 0.4 * scale, 1.0 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.65 * scale;
-                group.add(bodyMesh);
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.18 * scale, 0.38 * scale, 0.8 * scale, 32),
+                    material
+                );
+                body.position.y = 0.6 * scale;
+                group.add(body);
 
-                // 上部
-                const upper = new THREE.SphereGeometry(0.28 * scale, 16, 16);
-                const upperMesh = new THREE.Mesh(upper);
-                upperMesh.scale.y = 0.8;
-                upperMesh.position.y = 1.25 * scale;
-                group.add(upperMesh);
+                // 腰部装饰环
+                const waistRing = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.22 * scale, 0.03 * scale, 8, 32),
+                    material
+                );
+                waistRing.rotation.x = Math.PI / 2;
+                waistRing.position.y = 0.75 * scale;
+                group.add(waistRing);
 
-                // 皇冠尖
-                for (let i = 0; i < 8; i++) {
-                    const spike = new THREE.ConeGeometry(0.06 * scale, 0.2 * scale, 8);
-                    const spikeMesh = new THREE.Mesh(spike);
-                    const angle = (i / 8) * Math.PI * 2;
-                    spikeMesh.position.set(
-                        Math.cos(angle) * 0.2 * scale,
-                        1.55 * scale,
-                        Math.sin(angle) * 0.2 * scale
+                // 颈部
+                const neck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.15 * scale, 0.18 * scale, 0.15 * scale, 32),
+                    material
+                );
+                neck.position.y = 1.08 * scale;
+                group.add(neck);
+
+                // 皇冠底座
+                const crownBase = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.22 * scale, 32, 32),
+                    material
+                );
+                crownBase.scale.y = 0.6;
+                crownBase.position.y = 1.25 * scale;
+                group.add(crownBase);
+
+                // 皇冠尖角
+                const crownPoints = 8;
+                for (let i = 0; i < crownPoints; i++) {
+                    const spike = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.04 * scale, 0.2 * scale, 8),
+                        material
                     );
-                    group.add(spikeMesh);
+                    const angle = (i / crownPoints) * Math.PI * 2;
+                    spike.position.set(
+                        Math.cos(angle) * 0.15 * scale,
+                        1.45 * scale,
+                        Math.sin(angle) * 0.15 * scale
+                    );
+                    group.add(spike);
+
+                    // 尖角上的小球
+                    const ball = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.03 * scale, 8, 8),
+                        material
+                    );
+                    ball.position.set(
+                        Math.cos(angle) * 0.15 * scale,
+                        1.57 * scale,
+                        Math.sin(angle) * 0.15 * scale
+                    );
+                    group.add(ball);
                 }
 
-                // 顶部球
-                const crown = new THREE.SphereGeometry(0.12 * scale, 12, 12);
-                const crownMesh = new THREE.Mesh(crown);
-                crownMesh.position.y = 1.75 * scale;
-                group.add(crownMesh);
+                // 顶部大球
+                const crown = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.1 * scale, 16, 16),
+                    material
+                );
+                crown.position.y = 1.65 * scale;
+                group.add(crown);
 
-                return this.mergeGroup(group);
+                return group;
             }
 
-            // 王的几何体
-            createKingGeometry(scale) {
+            // 真实的王
+            createRealisticKing(scale, material) {
                 const group = new THREE.Group();
 
                 // 底座
-                const base = new THREE.CylinderGeometry(0.45 * scale, 0.5 * scale, 0.15 * scale, 16);
-                const baseMesh = new THREE.Mesh(base);
-                baseMesh.position.y = 0.075 * scale;
-                group.add(baseMesh);
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.48 * scale, 0.53 * scale, 0.12 * scale, 32),
+                    material
+                );
+                base.position.y = 0.06 * scale;
+                group.add(base);
+
+                // 底座装饰
+                const baseDecor = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.42 * scale, 0.48 * scale, 0.08 * scale, 32),
+                    material
+                );
+                baseDecor.position.y = 0.16 * scale;
+                group.add(baseDecor);
 
                 // 身体
-                const body = new THREE.CylinderGeometry(0.25 * scale, 0.42 * scale, 1.1 * scale, 16);
-                const bodyMesh = new THREE.Mesh(body);
-                bodyMesh.position.y = 0.7 * scale;
-                group.add(bodyMesh);
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2 * scale, 0.4 * scale, 0.9 * scale, 32),
+                    material
+                );
+                body.position.y = 0.65 * scale;
+                group.add(body);
 
-                // 上部
-                const upper = new THREE.SphereGeometry(0.3 * scale, 16, 16);
-                const upperMesh = new THREE.Mesh(upper);
-                upperMesh.scale.y = 0.7;
-                upperMesh.position.y = 1.35 * scale;
-                group.add(upperMesh);
+                // 腰部装饰环
+                const waistRing = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.25 * scale, 0.04 * scale, 8, 32),
+                    material
+                );
+                waistRing.rotation.x = Math.PI / 2;
+                waistRing.position.y = 0.8 * scale;
+                group.add(waistRing);
+
+                // 颈部
+                const neck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.17 * scale, 0.2 * scale, 0.15 * scale, 32),
+                    material
+                );
+                neck.position.y = 1.18 * scale;
+                group.add(neck);
+
+                // 头部
+                const head = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.22 * scale, 32, 32),
+                    material
+                );
+                head.scale.y = 0.7;
+                head.position.y = 1.35 * scale;
+                group.add(head);
+
+                // 十字架底座
+                const crossBase = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.06 * scale, 0.08 * scale, 0.1 * scale, 16),
+                    material
+                );
+                crossBase.position.y = 1.5 * scale;
+                group.add(crossBase);
 
                 // 十字架竖
-                const crossV = new THREE.BoxGeometry(0.08 * scale, 0.4 * scale, 0.08 * scale);
-                const crossVMesh = new THREE.Mesh(crossV);
-                crossVMesh.position.y = 1.75 * scale;
-                group.add(crossVMesh);
+                const crossV = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.07 * scale, 0.4 * scale, 0.07 * scale),
+                    material
+                );
+                crossV.position.y = 1.75 * scale;
+                group.add(crossV);
 
                 // 十字架横
-                const crossH = new THREE.BoxGeometry(0.25 * scale, 0.08 * scale, 0.08 * scale);
-                const crossHMesh = new THREE.Mesh(crossH);
-                crossHMesh.position.y = 1.85 * scale;
-                group.add(crossHMesh);
+                const crossH = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.25 * scale, 0.07 * scale, 0.07 * scale),
+                    material
+                );
+                crossH.position.y = 1.85 * scale;
+                group.add(crossH);
 
-                return this.mergeGroup(group);
+                return group;
             }
 
-            // 合并组为单个几何体
-            mergeGroup(group) {
-                const geometries = [];
-                group.traverse((child) => {
-                    if (child.geometry) {
-                        const cloned = child.geometry.clone();
-                        cloned.applyMatrix4(child.matrix);
-                        child.updateMatrixWorld();
-                        cloned.applyMatrix4(child.matrixWorld);
-                        geometries.push(cloned);
-                    }
+            // 创建手部模型
+            createHand() {
+                const group = new THREE.Group();
+                group.name = 'hand';
+
+                const skinMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xFFDBC4,
+                    roughness: 0.8,
+                    metalness: 0
                 });
 
-                if (geometries.length === 0) {
-                    return new THREE.CylinderGeometry(0.3, 0.35, 0.8, 16);
-                }
+                // 手掌
+                const palm = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.4, 0.1, 0.5),
+                    skinMaterial
+                );
+                group.add(palm);
 
-                // 简单返回第一个几何体，实际项目中应使用BufferGeometryUtils.mergeGeometries
-                const merged = new THREE.BufferGeometry();
-                const positions = [];
-                const normals = [];
+                // 手指
+                const fingerPositions = [
+                    { x: -0.15, z: 0.3 },
+                    { x: -0.05, z: 0.35 },
+                    { x: 0.05, z: 0.35 },
+                    { x: 0.15, z: 0.3 },
+                ];
 
-                geometries.forEach(geo => {
-                    const pos = geo.getAttribute('position');
-                    const norm = geo.getAttribute('normal');
-                    if (pos) {
-                        for (let i = 0; i < pos.count; i++) {
-                            positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
-                        }
-                    }
-                    if (norm) {
-                        for (let i = 0; i < norm.count; i++) {
-                            normals.push(norm.getX(i), norm.getY(i), norm.getZ(i));
-                        }
-                    }
+                fingerPositions.forEach((pos, i) => {
+                    const finger = new THREE.Mesh(
+                        new THREE.CapsuleGeometry(0.04, 0.25, 4, 8),
+                        skinMaterial
+                    );
+                    finger.position.set(pos.x, 0, pos.z);
+                    finger.rotation.x = -0.3;
+                    group.add(finger);
                 });
 
-                merged.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-                if (normals.length > 0) {
-                    merged.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-                }
-                merged.computeVertexNormals();
+                // 大拇指
+                const thumb = new THREE.Mesh(
+                    new THREE.CapsuleGeometry(0.045, 0.18, 4, 8),
+                    skinMaterial
+                );
+                thumb.position.set(-0.25, 0, 0);
+                thumb.rotation.z = 0.8;
+                thumb.rotation.x = -0.3;
+                group.add(thumb);
 
-                return merged;
+                group.visible = false;
+                group.position.set(0, 5, 0);
+                group.rotation.x = -Math.PI / 2;
+
+                this.hand = group;
+                this.scene.add(group);
+            }
+
+            // 手部动画 - 拿起棋子
+            async animateHandPickup(piecePosition) {
+                if (!this.hand || this.isHandAnimating) return;
+                this.isHandAnimating = true;
+                this.hand.visible = true;
+
+                const startPos = new THREE.Vector3(piecePosition.x, 5, piecePosition.z);
+                const pickupPos = new THREE.Vector3(piecePosition.x, piecePosition.y + 0.5, piecePosition.z);
+
+                this.hand.position.copy(startPos);
+
+                await this.animateHandMove(startPos, pickupPos, CONFIG.HAND_ANIMATION_DURATION);
+            }
+
+            // 手部动画 - 放下棋子
+            async animateHandDrop(targetPosition) {
+                if (!this.hand) return;
+
+                const dropPos = new THREE.Vector3(targetPosition.x, targetPosition.y + 0.5, targetPosition.z);
+                const exitPos = new THREE.Vector3(targetPosition.x, 5, targetPosition.z);
+
+                await this.animateHandMove(this.hand.position.clone(), dropPos, CONFIG.HAND_ANIMATION_DURATION);
+                await this.animateHandMove(dropPos, exitPos, CONFIG.HAND_ANIMATION_DURATION);
+
+                this.hand.visible = false;
+                this.isHandAnimating = false;
+            }
+
+            // 手部移动动画
+            animateHandMove(from, to, duration) {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+
+                    const animate = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+
+                        this.hand.position.lerpVectors(from, to, eased);
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            resolve();
+                        }
+                    };
+
+                    animate();
+                });
             }
 
             // 坐标转换
@@ -1318,11 +2157,9 @@
             // 设置事件监听
             setupEventListeners() {
                 const canvas = this.renderer.domElement;
-                // 鼠标事件
                 canvas.addEventListener('click', (e) => this.onClick(e));
                 canvas.addEventListener('mousemove', (e) => this.onHover(e));
 
-                // 触摸事件支持
                 canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
                 canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
 
@@ -1335,6 +2172,17 @@
                 document.getElementById('btn-new').addEventListener('click', () => this.showStartMenu());
                 document.getElementById('btn-play-again').addEventListener('click', () => this.playAgain());
                 document.getElementById('btn-back-menu').addEventListener('click', () => this.showStartMenu());
+                document.getElementById('btn-settings').addEventListener('click', () => this.toggleSettings());
+
+                // 音乐控制
+                document.getElementById('btn-music').addEventListener('click', () => {
+                    const isPlaying = this.music.toggle();
+                    document.getElementById('btn-music').textContent = isPlaying ? '🔊' : '🔇';
+                });
+
+                document.getElementById('volume-slider').addEventListener('input', (e) => {
+                    this.music.setVolume(e.target.value / 100);
+                });
 
                 // 难度选择
                 document.querySelectorAll('.diff-btn').forEach(btn => {
@@ -1353,39 +2201,59 @@
                         this.playerColor = e.target.dataset.color;
                     });
                 });
+
+                // 棋盘风格选择（菜单）
+                document.querySelectorAll('.board-style-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.board-style-btn').forEach(b => b.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        this.setBoardStyle(e.currentTarget.dataset.board);
+                    });
+                });
+
+                // 棋盘风格选择（设置面板）
+                document.querySelectorAll('.board-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.board-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.setBoardStyle(e.target.dataset.board);
+                    });
+                });
+
+                // 日夜模式选择
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.setDayNightMode(e.target.dataset.theme === 'day');
+                    });
+                });
             }
 
-            // 鼠标点击
-            onClick(event) {
-                if (this.isAIThinking || this.pendingPromotion) return;
-
-                this.updateMousePosition(event);
-                const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-
-                for (const intersect of intersects) {
-                    const object = intersect.object;
-                    const userData = object.userData;
-
-                    if (userData.type === 'piece') {
-                        this.handlePieceClick(userData.notation);
-                        return;
-                    } else if (userData.type === 'square') {
-                        this.handleSquareClick(userData.notation);
-                        return;
-                    }
-                }
-
-                // 点击空白处取消选择
-                this.clearSelection();
+            toggleSettings() {
+                const panel = document.getElementById('settings-panel');
+                panel.classList.toggle('show');
             }
 
-            // 鼠标悬停
-            onHover(event) {
-                this.updateMousePosition(event);
-                // 可以添加悬停高亮效果
+            setBoardStyle(style) {
+                this.boardStyle = style;
+                this.createBoard();
+
+                // 同步设置面板的按钮状态
+                document.querySelectorAll('.board-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.board === style);
+                });
             }
 
-            // 触摸开始
+            setDayNightMode(isDay) {
+                this.isDayMode = isDay;
+                document.body.classList.toggle('day-mode', isDay);
+                document.body.classList.toggle('night-mode', !isDay);
+                this.updateSceneBackground();
+                this.setupLighting();
+            }
+
+            // 触摸事件
             onTouchStart(event) {
                 if (event.touches.length === 1) {
                     this.touchStartTime = Date.now();
@@ -1396,23 +2264,19 @@
                 }
             }
 
-            // 触摸结束 - 判断是点击还是拖拽
             onTouchEnd(event) {
                 if (!this.touchStartPos) return;
 
                 const touchEndTime = Date.now();
                 const touchDuration = touchEndTime - this.touchStartTime;
 
-                // 如果有changedTouches，使用它来获取触摸结束位置
                 if (event.changedTouches.length > 0) {
                     const touch = event.changedTouches[0];
                     const dx = touch.clientX - this.touchStartPos.x;
                     const dy = touch.clientY - this.touchStartPos.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
-                    // 短时间内移动距离小，视为点击
                     if (touchDuration < 300 && distance < 20) {
-                        // 模拟点击
                         this.handleTouchClick(touch);
                     }
                 }
@@ -1420,7 +2284,6 @@
                 this.touchStartPos = null;
             }
 
-            // 处理触摸点击
             handleTouchClick(touch) {
                 if (this.isAIThinking || this.pendingPromotion) return;
 
@@ -1433,19 +2296,49 @@
 
                 for (const intersect of intersects) {
                     const object = intersect.object;
-                    const userData = object.userData;
+                    const userData = object.userData || {};
+                    const parentData = object.parent?.userData || {};
+                    const data = userData.type ? userData : parentData;
 
-                    if (userData.type === 'piece') {
-                        this.handlePieceClick(userData.notation);
+                    if (data.type === 'piece') {
+                        this.handlePieceClick(data.notation);
                         return;
-                    } else if (userData.type === 'square') {
-                        this.handleSquareClick(userData.notation);
+                    } else if (data.type === 'square') {
+                        this.handleSquareClick(data.notation);
                         return;
                     }
                 }
 
-                // 点击空白处取消选择
                 this.clearSelection();
+            }
+
+            // 鼠标点击
+            onClick(event) {
+                if (this.isAIThinking || this.pendingPromotion) return;
+
+                this.updateMousePosition(event);
+                const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+                for (const intersect of intersects) {
+                    const object = intersect.object;
+                    const userData = object.userData || {};
+                    const parentData = object.parent?.userData || {};
+                    const data = userData.type ? userData : parentData;
+
+                    if (data.type === 'piece') {
+                        this.handlePieceClick(data.notation);
+                        return;
+                    } else if (data.type === 'square') {
+                        this.handleSquareClick(data.notation);
+                        return;
+                    }
+                }
+
+                this.clearSelection();
+            }
+
+            onHover(event) {
+                this.updateMousePosition(event);
             }
 
             updateMousePosition(event) {
@@ -1455,62 +2348,54 @@
                 this.raycaster.setFromCamera(this.mouse, this.camera);
             }
 
-            // 处理棋子点击
             handlePieceClick(notation) {
                 const piece = this.chess.get(notation);
                 if (!piece) return;
 
-                // 检查是否是当前回合的棋子
                 const currentTurn = this.chess.turn();
 
-                // 人机模式下，只能选择自己的棋子
                 if (this.gameMode === 'pva' && piece.color !== this.playerColor) {
                     return;
                 }
 
                 if (piece.color !== currentTurn) {
-                    // 如果已选择棋子，尝试吃子
                     if (this.selectedSquare) {
                         this.handleSquareClick(notation);
                     }
                     return;
                 }
 
-                // 选择新棋子
                 this.selectPiece(notation);
             }
 
-            // 选择棋子
             selectPiece(notation) {
                 this.clearSelection();
 
                 this.selectedSquare = notation;
                 this.selectedPiece = this.pieces[notation];
 
-                // 高亮选中的棋子
                 if (this.selectedPiece) {
                     this.highlightPiece(this.selectedPiece, true);
                 }
 
-                // 显示合法移动
                 this.validMoves = this.chess.moves({ square: notation, verbose: true });
                 this.showValidMoves();
             }
 
-            // 高亮棋子
             highlightPiece(piece, selected) {
-                if (piece && piece.material) {
-                    if (selected) {
-                        piece.material.emissive = new THREE.Color(CONFIG.COLORS.selected);
-                        piece.material.emissiveIntensity = 0.3;
-                    } else {
-                        piece.material.emissive = new THREE.Color(0x000000);
-                        piece.material.emissiveIntensity = 0;
+                piece.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        if (selected) {
+                            child.material.emissive = new THREE.Color(CONFIG.COLORS.selected);
+                            child.material.emissiveIntensity = 0.3;
+                        } else {
+                            child.material.emissive = new THREE.Color(0x000000);
+                            child.material.emissiveIntensity = 0;
+                        }
                     }
-                }
+                });
             }
 
-            // 显示合法移动
             showValidMoves() {
                 this.validMoves.forEach(move => {
                     const square = this.squares[move.to];
@@ -1521,14 +2406,12 @@
                 });
             }
 
-            // 高亮格子
             highlightSquare(square, type) {
                 const color = type === 'capture' ? CONFIG.COLORS.capture :
                              type === 'move' ? CONFIG.COLORS.validMove :
                              type === 'lastMove' ? CONFIG.COLORS.lastMove :
                              CONFIG.COLORS.selected;
 
-                // 创建高亮标记
                 const geometry = type === 'capture'
                     ? new THREE.RingGeometry(0.25, 0.35, 32)
                     : new THREE.CircleGeometry(0.15, 32);
@@ -1553,14 +2436,11 @@
                 this.highlights.push(highlight);
             }
 
-            // 清除选择
             clearSelection() {
-                // 清除棋子高亮
                 if (this.selectedPiece) {
                     this.highlightPiece(this.selectedPiece, false);
                 }
 
-                // 清除高亮标记
                 this.highlights.forEach(h => {
                     this.scene.remove(h);
                     if (h.geometry) h.geometry.dispose();
@@ -1573,11 +2453,9 @@
                 this.validMoves = [];
             }
 
-            // 处理格子点击
             handleSquareClick(notation) {
                 if (!this.selectedSquare) return;
 
-                // 检查是否是合法移动
                 const move = this.validMoves.find(m => m.to === notation);
                 if (move) {
                     this.makeMove(move);
@@ -1586,9 +2464,7 @@
                 }
             }
 
-            // 执行移动
             makeMove(move) {
-                // 检查是否需要升变
                 if (move.flags.includes('p')) {
                     this.pendingPromotion = move;
                     this.showPromotionDialog(move);
@@ -1598,7 +2474,6 @@
                 this.executeMove(move);
             }
 
-            // 显示升变对话框
             showPromotionDialog(move) {
                 const modal = document.getElementById('promotion-modal');
                 const container = document.getElementById('promotion-pieces');
@@ -1628,70 +2503,65 @@
                 modal.classList.add('show');
             }
 
-            // 执行移动（包含动画）
             async executeMove(move) {
                 this.clearSelection();
 
-                // 执行chess.js移动
                 const result = this.chess.move(move);
                 if (!result) return;
 
-                // 记录上一步
                 this.lastMove = { from: move.from, to: move.to };
 
-                // 更新3D场景
-                await this.animateMove(move);
+                // 手部动画和棋子移动
+                const fromPos = this.notationToPosition(move.from);
+                const toPos = this.notationToPosition(move.to);
 
-                // 特殊走法处理
+                await this.animateHandPickup(fromPos);
+                await this.animateMove(move);
+                await this.animateHandDrop(toPos);
+
+                // 播放音效
+                if (result.captured) {
+                    this.music.playCaptureSound();
+                } else {
+                    this.music.playMoveSound();
+                }
+
                 if (result.flags.includes('k') || result.flags.includes('q')) {
-                    // 王车易位
                     await this.handleCastling(result);
                 }
                 if (result.flags.includes('e')) {
-                    // 吃过路兵
                     this.handleEnPassant(result);
                 }
                 if (result.promotion) {
-                    // 升变
                     this.handlePromotion(move.to, result.color, result.promotion);
                 }
 
-                // 显示上一步高亮
                 this.showLastMove();
-
-                // 更新UI
                 this.updateUI();
 
-                // 检查游戏结束
                 if (this.checkGameEnd()) return;
 
-                // AI回合
                 if (this.gameMode === 'pva' && this.chess.turn() !== this.playerColor) {
                     this.makeAIMove();
                 }
             }
 
-            // 移动动画
             async animateMove(move) {
                 const piece = this.pieces[move.from];
                 if (!piece) return;
 
-                // 如果目标位置有棋子（吃子），先移除
                 if (this.pieces[move.to]) {
                     this.removePiece(move.to);
                 }
 
-                // 更新数据
                 delete this.pieces[move.from];
                 this.pieces[move.to] = piece;
                 piece.userData.notation = move.to;
 
-                // 动画移动
                 const targetPos = this.notationToPosition(move.to);
                 await this.animatePieceMove(piece, targetPos);
             }
 
-            // 棋子移动动画
             animatePieceMove(piece, targetPos) {
                 return new Promise((resolve) => {
                     const startPos = piece.position.clone();
@@ -1702,10 +2572,7 @@
                         const elapsed = Date.now() - startTime;
                         const progress = Math.min(elapsed / duration, 1);
 
-                        // 缓动函数
                         const eased = 1 - Math.pow(1 - progress, 3);
-
-                        // 抛物线高度
                         const height = Math.sin(progress * Math.PI) * 0.5;
 
                         piece.position.x = startPos.x + (targetPos.x - startPos.x) * eased;
@@ -1724,27 +2591,25 @@
                 });
             }
 
-            // 移除棋子
             removePiece(notation) {
                 const piece = this.pieces[notation];
                 if (piece) {
                     this.scene.remove(piece);
-                    if (piece.geometry) piece.geometry.dispose();
-                    if (piece.material) piece.material.dispose();
+                    piece.traverse((child) => {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material) child.material.dispose();
+                    });
                     delete this.pieces[notation];
                 }
             }
 
-            // 处理王车易位
             async handleCastling(result) {
                 let rookFrom, rookTo;
 
                 if (result.flags.includes('k')) {
-                    // 短易位
                     rookFrom = result.color === 'w' ? 'h1' : 'h8';
                     rookTo = result.color === 'w' ? 'f1' : 'f8';
                 } else {
-                    // 长易位
                     rookFrom = result.color === 'w' ? 'a1' : 'a8';
                     rookTo = result.color === 'w' ? 'd1' : 'd8';
                 }
@@ -1760,25 +2625,18 @@
                 }
             }
 
-            // 处理吃过路兵
             handleEnPassant(result) {
-                // 被吃的兵在目标格的同列，但在移动前的行
                 const capturedCol = result.to[0];
                 const capturedRow = result.color === 'w' ? '5' : '4';
                 const capturedSquare = capturedCol + capturedRow;
                 this.removePiece(capturedSquare);
             }
 
-            // 处理升变
             handlePromotion(notation, color, pieceType) {
-                // 移除旧兵
                 this.removePiece(notation);
-
-                // 创建新棋子
                 this.createPiece(pieceType, color, notation);
             }
 
-            // 显示上一步高亮
             showLastMove() {
                 if (this.lastMove) {
                     const fromSquare = this.squares[this.lastMove.from];
@@ -1793,14 +2651,12 @@
                 }
             }
 
-            // 重置棋盘格子颜色
             resetSquareColors() {
                 Object.values(this.squares).forEach(square => {
                     square.material.color.setHex(square.userData.originalColor);
                 });
             }
 
-            // 更新UI
             updateUI() {
                 const turn = this.chess.turn();
                 const turnColor = document.getElementById('turn-color');
@@ -1811,22 +2667,18 @@
                 turnColor.className = 'turn-color ' + (turn === 'w' ? 'white' : 'black');
                 turnText.textContent = turn === 'w' ? '白方回合' : '黑方回合';
 
-                // 状态信息
                 if (this.chess.in_check()) {
                     status.textContent = '将军！';
-                    status.style.color = '#ff4444';
+                    status.style.color = this.isDayMode ? '#d00' : '#ff4444';
                 } else {
                     status.textContent = '';
                 }
 
-                // 悔棋按钮
                 undoBtn.disabled = this.chess.history().length === 0 || this.isAIThinking;
 
-                // 更新历史记录
                 this.updateMoveHistory();
             }
 
-            // 更新走法历史
             updateMoveHistory() {
                 const history = this.chess.history();
                 const container = document.getElementById('move-history');
@@ -1848,7 +2700,6 @@
                 container.scrollTop = container.scrollHeight;
             }
 
-            // 检查游戏结束
             checkGameEnd() {
                 let result = null;
                 let detail = null;
@@ -1878,30 +2729,25 @@
                 return false;
             }
 
-            // 显示游戏结束
             showGameOver(result, detail) {
                 document.getElementById('game-result').textContent = result;
                 document.getElementById('game-result-detail').textContent = detail;
                 document.getElementById('game-over-modal').classList.add('show');
             }
 
-            // AI移动
             async makeAIMove() {
                 this.isAIThinking = true;
                 document.getElementById('ai-thinking').classList.add('show');
                 document.getElementById('btn-undo').disabled = true;
 
-                // 延迟一下让UI更新
                 await new Promise(r => setTimeout(r, 100));
 
-                // 获取AI走法
                 const move = await this.getAIMove();
 
                 this.isAIThinking = false;
                 document.getElementById('ai-thinking').classList.remove('show');
 
                 if (move) {
-                    // 将UCI格式转换为chess.js格式
                     const from = move.substring(0, 2);
                     const to = move.substring(2, 4);
                     const promotion = move.length > 4 ? move[4] : undefined;
@@ -1918,7 +2764,6 @@
                 }
             }
 
-            // 获取AI走法（简单的Minimax实现）
             async getAIMove() {
                 const depth = this.aiLevel + 1;
                 const moves = this.chess.moves({ verbose: true });
@@ -1941,7 +2786,6 @@
                     }
                 }
 
-                // 添加随机性（低难度）
                 if (this.aiLevel < 2 && Math.random() < 0.3) {
                     bestMove = moves[Math.floor(Math.random() * moves.length)];
                 }
@@ -1949,7 +2793,6 @@
                 return bestMove ? bestMove.from + bestMove.to + (bestMove.promotion || '') : null;
             }
 
-            // Minimax算法
             minimax(depth, alpha, beta, isMaximizing) {
                 if (depth === 0 || this.chess.game_over()) {
                     return this.evaluateBoard();
@@ -1982,7 +2825,6 @@
                 }
             }
 
-            // 评估棋局
             evaluateBoard() {
                 const pieceValues = {
                     p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000
@@ -2001,7 +2843,6 @@
                     }
                 }
 
-                // 额外评估
                 if (this.chess.in_checkmate()) {
                     score = this.chess.turn() === 'w' ? -100000 : 100000;
                 }
@@ -2009,43 +2850,33 @@
                 return score;
             }
 
-            // 悔棋
             undoMove() {
                 if (this.isAIThinking) return;
 
                 this.chess.undo();
                 if (this.gameMode === 'pva') {
-                    this.chess.undo(); // AI也悔一步
+                    this.chess.undo();
                 }
 
                 this.refreshBoard();
                 this.updateUI();
             }
 
-            // 刷新棋盘
             refreshBoard() {
-                // 清除所有棋子
                 Object.keys(this.pieces).forEach(notation => {
                     this.removePiece(notation);
                 });
 
-                // 重新创建棋子
                 this.createPieces();
-
-                // 重置格子颜色
                 this.resetSquareColors();
-
-                // 清除选择
                 this.clearSelection();
                 this.lastMove = null;
             }
 
-            // 翻转视角
             flipBoard() {
                 const currentPos = this.camera.position.clone();
                 const target = new THREE.Vector3(-currentPos.x, currentPos.y, -currentPos.z);
 
-                // 动画翻转
                 const startPos = this.camera.position.clone();
                 const startTime = Date.now();
                 const duration = 500;
@@ -2066,31 +2897,28 @@
                 animate();
             }
 
-            // 开始游戏
             startGame(mode) {
                 this.gameMode = mode;
                 document.getElementById('start-menu').style.display = 'none';
+                document.getElementById('settings-panel').classList.remove('show');
                 this.resetGame();
             }
 
-            // 显示AI选项
             showAIOptions() {
                 document.getElementById('difficulty-select').classList.add('show');
             }
 
-            // 开始AI游戏
             startAIGame() {
                 this.gameMode = 'pva';
                 document.getElementById('start-menu').style.display = 'none';
+                document.getElementById('settings-panel').classList.remove('show');
                 this.resetGame();
 
-                // 如果玩家执黑，AI先走
                 if (this.playerColor === 'b') {
                     setTimeout(() => this.makeAIMove(), 500);
                 }
             }
 
-            // 重置游戏
             resetGame() {
                 this.chess.reset();
                 this.refreshBoard();
@@ -2098,7 +2926,6 @@
                 document.getElementById('game-over-modal').classList.remove('show');
             }
 
-            // 再来一局
             playAgain() {
                 this.resetGame();
                 if (this.gameMode === 'pva' && this.playerColor === 'b') {
@@ -2106,29 +2933,26 @@
                 }
             }
 
-            // 显示开始菜单
             showStartMenu() {
                 document.getElementById('start-menu').style.display = 'flex';
                 document.getElementById('difficulty-select').classList.remove('show');
                 document.getElementById('game-over-modal').classList.remove('show');
+                document.getElementById('settings-panel').classList.remove('show');
                 this.resetGame();
             }
 
-            // 窗口大小调整
             onWindowResize() {
                 this.camera.aspect = window.innerWidth / window.innerHeight;
                 this.camera.updateProjectionMatrix();
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
             }
 
-            // 检测移动端
             isMobile() {
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
                        (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
                        window.innerWidth <= 768;
             }
 
-            // 动画循环
             animate() {
                 requestAnimationFrame(() => this.animate());
                 this.controls.update();
